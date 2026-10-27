@@ -2,7 +2,7 @@
 
 A Lean implementation of lexical path cleaning, following the Go path.Clean rules. This is a Proven Commons project: it rebuilds a widely used rule in Lean and proves the new code follows its written specification.
 
-Status: not verified. No code has landed yet, and no plan issue has been posted. The specification has not been approved by a reviewer, so do not call this verified.
+Status: not verified. No code has landed yet. Plan issue 1 holds the first slice, and it is unclaimed. The specification has not been approved by a reviewer, so do not call this verified.
 
 ## First slice
 
