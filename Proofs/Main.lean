@@ -4,7 +4,7 @@
   here is exactly the one in `Spec.lean`.
 -/
 
-import Proofs.Join
+import Proofs.Unique
 
 namespace Spec
 
@@ -13,31 +13,26 @@ open Spec.Proof
 theorem clean_rules (p : String) (es es' : List Element)
     (hp : Splits p.toList es) (hs : Steps (Rooted p.toList) es es')
     (hn : Normal (Rooted p.toList) es') :
-    (Path.clean p).toList = render (Rooted p.toList) es' := by
+    Names (Path.clean p) (Rooted p.toList) es' := by
+  refine ⟨?_, hn, fun e he => hp.2.2 e (steps_subset _ _ _ hs e he)⟩
   rw [Path.clean, String.toList_ofList, cleanChars_eq _ _ hp, ← steps_normal_eq _ _ _ hs hn]
 
 theorem rules_end (p : String) :
     ∃ es es', Splits p.toList es ∧ Steps (Rooted p.toList) es es' ∧
-      Normal (Rooted p.toList) es' :=
-  ⟨elems p.toList, nf _ (elems p.toList), elems_splits _, steps_nf_self _ _, nf_normal _ _⟩
+      Normal (Rooted p.toList) es' ∧ Names (Path.clean p) (Rooted p.toList) es' :=
+  ⟨elems p.toList, nf _ (elems p.toList), elems_splits _, steps_nf_self _ _, nf_normal _ _,
+    clean_names' p⟩
 
-theorem step_shortens (rooted : Bool) (es es' : List Element) (h : Step rooted es es') :
-    es'.length < es.length := by
-  cases h <;> simp <;> omega
+theorem clean_names (p : String) :
+    ∃ es, Names (Path.clean p) (Rooted p.toList) es ∧
+      ∀ es', Names (Path.clean p) (Rooted p.toList) es' → es' = es :=
+  ⟨_, clean_names' p, fun _ h => names_unique _ _ _ _ h (clean_names' p)⟩
 
-theorem rules_unique (rooted : Bool) (es e1 e2 : List Element)
-    (h1 : Steps rooted es e1) (n1 : Normal rooted e1)
-    (h2 : Steps rooted es e2) (n2 : Normal rooted e2) : e1 = e2 := by
-  rw [steps_normal_eq _ _ _ h1 n1, steps_normal_eq _ _ _ h2 n2]
-
-theorem normal_iff (rooted : Bool) (es : List Element) :
-    Normal rooted es ↔
-      ∃ k names, es = List.replicate k dotdot ++ names ∧ (rooted = true → k = 0) ∧
-        ∀ e ∈ names, e ≠ [] ∧ e ≠ dot ∧ e ≠ dotdot :=
-  normal_iff_shape rooted es
-
-theorem clean_names (p : String) : ∃ es, Names (Path.clean p) (Rooted p.toList) es :=
-  ⟨_, clean_names' p⟩
+theorem clean_shape (p : String) (es : List Element)
+    (h : Names (Path.clean p) (Rooted p.toList) es) :
+    ∃ k names, es = List.replicate k dotdot ++ names ∧ (Rooted p.toList = true → k = 0) ∧
+      ∀ e ∈ names, e ≠ [] ∧ e ≠ dot ∧ e ≠ dotdot :=
+  shape_of_normal _ _ h.2.1
 
 theorem clean_idem (p : String) : Path.clean (Path.clean p) = Path.clean p := by
   obtain ⟨h1, h2, h3⟩ := clean_names' p

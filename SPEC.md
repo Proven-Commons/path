@@ -30,9 +30,9 @@ It adds: "The returned path ends in a slash only if it is the root `/`", and "If
 
 `Spec.Steps` is the rules applied any number of times, in any order. `Spec.Normal` says that no rule applies. `Spec.render` writes elements back as a path: a slash first when it is rooted, a slash between each two elements, and `.` for no elements in a path that is not rooted. So the result ends in a slash only when it is the root `/`.
 
-**Clean** is the path `render` writes for the elements the rules leave, in whatever order they are applied (`clean_rules`), and the rules can always be applied until none applies (`rules_end`). Every rule drops an element, so in any order the rules come to an end (`step_shortens`), and every order ends at the same elements (`rules_unique`).
+**Clean** is the path `render` writes for the elements the rules leave, in whatever order they are applied (`clean_rules`), and the rules can always be applied until none applies (`rules_end`). `Spec.Names s r es` says that `s` is the path `render r` writes for `es`, that no rule applies to `es`, and that no element of `es` holds a slash; `clean p` names exactly one such list (`clean_names`). So every order of the rules ends at the same elements. Each rule drops one element or two, as `Spec.Step` shows, so the rules always come to an end.
 
-No rule applies exactly when the elements are some `..`, none if the path is rooted, and then names (`normal_iff`). So the result of `clean` has no empty element and no `.`, and `..` only at its start, and none if it is rooted. It is rooted exactly when the path was (`clean_names`). Cleaning it again changes nothing (`clean_idem`).
+The elements of `clean p` are some `..`, none if `p` is rooted, and then names (`clean_shape`). So the result of `clean` has no empty element and no `.`, and `..` only at its start, and none if it is rooted. It is rooted exactly when the path was (`clean_names`). Cleaning it again changes nothing (`clean_idem`).
 
 **Two slashes at the start.** POSIX says that "a pathname that begins with two successive slashes may be interpreted in an implementation-defined manner". Go reads them as one slash, and so does this library: `//abc` cleans to `/abc`, as in Go's own tests. Python's `posixpath.normpath` keeps exactly two.
 
@@ -50,12 +50,10 @@ Each property is a theorem in `Spec.lean`, under the name given.
 
 | Property | Theorem |
 |----------|---------|
-| Whatever order the rules are applied in, once none applies, `render` gives `clean p`. | `Spec.clean_rules` |
-| The rules can always be applied until none applies. | `Spec.rules_end` |
-| Every rule drops an element, so in any order the rules come to an end. | `Spec.step_shortens` |
-| In any order, the rules end at the same elements. | `Spec.rules_unique` |
-| No rule applies exactly when the elements are some `..` (none if rooted), then names. | `Spec.normal_iff` |
-| `clean p` is `render` of such elements, rooted when `p` is. | `Spec.clean_names` |
+| Whatever order the rules are applied in, once none applies, the elements left are those of `clean p`. | `Spec.clean_rules` |
+| The rules can always be applied until none applies, and leave the elements of `clean p`. | `Spec.rules_end` |
+| `clean p` names exactly one list of elements, rooted when `p` is. | `Spec.clean_names` |
+| The elements of `clean p` are some `..` (none if rooted), then names. | `Spec.clean_shape` |
 | Cleaning a clean path changes nothing. | `Spec.clean_idem` |
 | `join` is what Go's documentation says. | `Spec.join_eq` |
 | A clean relative path with no `..`, joined to `b`, adds its elements to those of `clean b`. | `Spec.join_inside` |

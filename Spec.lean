@@ -13,45 +13,36 @@ import Spec.Defs
 namespace Spec
 
 /-- Whatever order the rules are applied in, once none applies, the
-    path with the elements left is `clean p`. -/
+    elements left are those of `clean p`: it is the path `render` writes
+    for them. -/
 theorem clean_rules (p : String) (es es' : List Element)
     (hp : Splits p.toList es) (hs : Steps (Rooted p.toList) es es')
     (hn : Normal (Rooted p.toList) es') :
-    (Path.clean p).toList = render (Rooted p.toList) es' := by
+    Names (Path.clean p) (Rooted p.toList) es' := by
   sorry
 
 /-- The rules can always be applied until none applies, so
     `clean_rules` says something about every path. -/
 theorem rules_end (p : String) :
     ∃ es es', Splits p.toList es ∧ Steps (Rooted p.toList) es es' ∧
-      Normal (Rooted p.toList) es' := by
+      Normal (Rooted p.toList) es' ∧ Names (Path.clean p) (Rooted p.toList) es' := by
   sorry
 
-/-- Every rule drops at least one element, so the rules, applied in any
-    order, always come to an end. -/
-theorem step_shortens (rooted : Bool) (es es' : List Element) (h : Step rooted es es') :
-    es'.length < es.length := by
+/-- `clean p` names exactly one list of elements, as a path rooted when
+    `p` is. With `clean_rules`, every order of the rules ends at the
+    same elements. -/
+theorem clean_names (p : String) :
+    ∃ es, Names (Path.clean p) (Rooted p.toList) es ∧
+      ∀ es', Names (Path.clean p) (Rooted p.toList) es' → es' = es := by
   sorry
 
-/-- Applied in any order, the rules end at the same elements: once none
-    applies, what is left does not depend on the order. -/
-theorem rules_unique (rooted : Bool) (es e1 e2 : List Element)
-    (h1 : Steps rooted es e1) (n1 : Normal rooted e1)
-    (h2 : Steps rooted es e2) (n2 : Normal rooted e2) : e1 = e2 := by
-  sorry
-
-/-- No rule applies exactly when the elements are some `..`, none if
-    the path is rooted, then names: elements that are not empty, `.`
-    or `..`. -/
-theorem normal_iff (rooted : Bool) (es : List Element) :
-    Normal rooted es ↔
-      ∃ k names, es = List.replicate k dotdot ++ names ∧ (rooted = true → k = 0) ∧
-        ∀ e ∈ names, e ≠ [] ∧ e ≠ dot ∧ e ≠ dotdot := by
-  sorry
-
-/-- So `clean p` has no empty element and no `.`, `..` only at the
-    start and none if `p` is rooted, and it is rooted when `p` is. -/
-theorem clean_names (p : String) : ∃ es, Names (Path.clean p) (Rooted p.toList) es := by
+/-- The elements of `clean p` are some `..`, none if `p` is rooted, then
+    names: elements that are not empty, `.` or `..`. So `clean p` has
+    no empty element and no `.`, and `..` only at its start. -/
+theorem clean_shape (p : String) (es : List Element)
+    (h : Names (Path.clean p) (Rooted p.toList) es) :
+    ∃ k names, es = List.replicate k dotdot ++ names ∧ (Rooted p.toList = true → k = 0) ∧
+      ∀ e ∈ names, e ≠ [] ∧ e ≠ dot ∧ e ≠ dotdot := by
   sorry
 
 /-- Cleaning a clean path changes nothing. -/

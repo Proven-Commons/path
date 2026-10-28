@@ -6,7 +6,7 @@ It only reads the string. It never looks at a file system, so it says nothing ab
 
 Machine-checked proofs show:
 
-- **Clean is what Go's four rules give.** Go's documentation says Clean applies four rules "iteratively until no further processing can be done". Applied in any order, the rules come to an end, and at the same elements, and `clean` gives them, written back as a path.
+- **Clean is what Go's four rules give.** Go's documentation says Clean applies four rules "iteratively until no further processing can be done". Applied in any order until none applies, the rules leave the same elements, and `clean` gives them, written back as a path.
 - **The result is clean.** It has no empty element and no `.`, and `..` only at its start, and none if the path is rooted. Cleaning it again changes nothing.
 - **Join is what Go's documentation says**, and **joined paths stay inside.** A clean relative path with no `..`, joined to any folder, gives the folder's elements and then its own. Any path cleaned as a rooted path, `clean ("/" ++ u)`, and joined to a folder that is not the empty string, never leaves the folder.
 - **Go's own tests** of Clean and Join give Go's results.
@@ -30,12 +30,10 @@ The statements are in `Spec.lean`. The rules they use are in `Spec/Defs.lean`, w
 
 | Claim | Theorem |
 |-------|---------|
-| Whatever order Go's rules are applied in to the elements of a path, once none applies, the path they leave is `clean p`. | `Spec.clean_rules` |
-| The rules can always be applied until none applies. | `Spec.rules_end` |
-| Every rule drops an element, so in any order the rules come to an end. | `Spec.step_shortens` |
-| In any order, the rules end at the same elements. | `Spec.rules_unique` |
-| No rule applies exactly when the elements are some `..`, none if the path is rooted, then names. | `Spec.normal_iff` |
-| `clean p` is such a path, and rooted exactly when `p` is. | `Spec.clean_names` |
+| Whatever order Go's rules are applied in to the elements of a path, once none applies, the elements they leave are those of `clean p`. | `Spec.clean_rules` |
+| The rules can always be applied until none applies, and they leave the elements of `clean p`. | `Spec.rules_end` |
+| `clean p` names exactly one list of elements, as a path rooted exactly when `p` is; so in any order the rules end at the same elements. | `Spec.clean_names` |
+| The elements of `clean p` are some `..`, none if `p` is rooted, then names: no empty element and no `.`. | `Spec.clean_shape` |
 | Cleaning a clean path changes nothing. | `Spec.clean_idem` |
 | `join` leaves out empty elements, joins the rest with slashes and cleans them, and gives the empty string when nothing is left. | `Spec.join_eq` |
 | A clean relative path with no `..`, joined to any path `b`, gives the elements of `clean b`, then its own. | `Spec.join_inside` |
