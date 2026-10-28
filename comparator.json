@@ -1,0 +1,10 @@
+{
+  "challenge_module": "Spec",
+  "solution_module": "Proofs",
+  "theorem_names": [
+    "Spec.clean_rules", "Spec.rules_end", "Spec.clean_names", "Spec.clean_shape",
+    "Spec.clean_idem", "Spec.join_eq", "Spec.join_inside", "Spec.join_root_inside",
+    "Spec.go_clean_tests", "Spec.go_join_tests"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}

@@ -1,0 +1,16 @@
+name = "path"
+version = "0.1.0"
+defaultTargets = ["Path", "Spec", "Proofs", "path"]
+
+[[lean_lib]]
+name = "Path"
+
+[[lean_lib]]
+name = "Spec"
+
+[[lean_lib]]
+name = "Proofs"
+
+[[lean_exe]]
+name = "path"
+root = "Main"
