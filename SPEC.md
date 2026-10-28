@@ -1,6 +1,6 @@
 # Specification: path
 
-Go's `path.Clean` (https://pkg.go.dev/path#Clean) gives "the shortest path name equivalent to path by purely lexical processing". It reads only the string: it never looks at a file system. This library does the same, and Go's `path.Join`, in Lean, on strings.
+Go's documentation of `path.Clean` (https://pkg.go.dev/path#Clean) says it gives "the shortest path name equivalent to path by purely lexical processing". It reads only the string: it never looks at a file system. This library cleans paths by the rules of that documentation, and joins them as `path.Join` does, in Lean, on strings. That the result is the shortest such path is Go's description; it is not a statement here.
 
 A reviewer who did not write this specification approves it. The approval also covers `Spec.lean`, `Spec/Defs.lean`, and the other files that `bar.toml` lists.
 
@@ -25,12 +25,12 @@ It adds: "The returned path ends in a slash only if it is the root `/`", and "If
 
 - **Rule 1** drops an empty element. On elements, rule 1 and the sentence on a slash at the end say the same thing.
 - **Rule 2** drops a `.` element.
-- **Rule 3** drops a `..` element and the element before it, when that is a name: not empty, not `.` and not `..`. An empty element or a `.` before the `..` is dropped first, by rule 1 or 2.
+- **Rule 3** drops a `..` element and the element before it, when that is a name: not empty, not `.` and not `..`. An empty element or a `.` before the `..` is dropped first, by rule 1 or 2. Go's words are "the non-`..` element that precedes it"; read literally, with an empty element or a `.` allowed there, the rules would end in more than one place. `abc/./../def` could end as `abc/def` or as `def`, and Go's own tests give `def`.
 - **Rule 4** drops a `..` at the start of a rooted path.
 
 `Spec.Steps` is the rules applied any number of times, in any order. `Spec.Normal` says that no rule applies. `Spec.render` writes elements back as a path: a slash first when it is rooted, a slash between each two elements, and `.` for no elements in a path that is not rooted. So the result ends in a slash only when it is the root `/`.
 
-**Clean** is the path `render` writes for the elements the rules leave, in whatever order they are applied (`clean_rules`), and the rules can always be applied until none applies (`rules_end`). So the order does not matter: every order ends at the same elements.
+**Clean** is the path `render` writes for the elements the rules leave, in whatever order they are applied (`clean_rules`), and the rules can always be applied until none applies (`rules_end`). Every rule drops an element, so in any order the rules come to an end (`step_shortens`), and every order ends at the same elements (`rules_unique`).
 
 No rule applies exactly when the elements are some `..`, none if the path is rooted, and then names (`normal_iff`). So the result of `clean` has no empty element and no `.`, and `..` only at its start, and none if it is rooted. It is rooted exactly when the path was (`clean_names`). Cleaning it again changes nothing (`clean_idem`).
 
@@ -52,6 +52,8 @@ Each property is a theorem in `Spec.lean`, under the name given.
 |----------|---------|
 | Whatever order the rules are applied in, once none applies, `render` gives `clean p`. | `Spec.clean_rules` |
 | The rules can always be applied until none applies. | `Spec.rules_end` |
+| Every rule drops an element, so in any order the rules come to an end. | `Spec.step_shortens` |
+| In any order, the rules end at the same elements. | `Spec.rules_unique` |
 | No rule applies exactly when the elements are some `..` (none if rooted), then names. | `Spec.normal_iff` |
 | `clean p` is `render` of such elements, rooted when `p` is. | `Spec.clean_names` |
 | Cleaning a clean path changes nothing. | `Spec.clean_idem` |
@@ -73,4 +75,4 @@ The functions take and give Lean strings, which are Unicode text in UTF-8. Go's 
 - `path join ELEM...` prints the elements joined and cleaned, and an empty line for no elements or only empty ones.
 - `path serve` answers requests from the differential tests, one per line. The header comment of `Main.lean` gives the protocol.
 
-Wrong arguments exit with 2. Every answer comes from the functions above.
+Wrong arguments exit with 2. Every answer comes from the functions above. The Lean runtime reads the arguments of `clean` and `join` as UTF-8 and replaces each run of octets that are not UTF-8 with U+FFFD, so for such an argument the tool prints a path Go would not; `path serve` answers `error` for them.

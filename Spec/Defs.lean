@@ -63,7 +63,12 @@ inductive Step (rooted : Bool) : List Element → List Element → Prop
   /-- Rule 2: drop a `.` element. -/
   | dot (xs ys : List Element) : Step rooted (xs ++ dot :: ys) (xs ++ ys)
   /-- Rule 3: drop a `..` element and the element before it, when that
-      is a name: not empty, not `.` and not `..`. -/
+      is a name: not empty, not `.` and not `..`. Go's words are "the
+      non-.. element that precedes it". Read literally, with an empty
+      element or a `.` allowed there, the rules would end in more than one
+      place: `abc/./../def` could end as `abc/def` or `def`, and Go's own
+      tests give `def`. An empty element or a `.` before the `..` is
+      dropped first, by rule 1 or 2. -/
   | parent (xs : List Element) (e : Element) (ys : List Element) :
       e ≠ [] → e ≠ dot → e ≠ dotdot →
       Step rooted (xs ++ e :: dotdot :: ys) (xs ++ ys)

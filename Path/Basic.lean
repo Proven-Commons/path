@@ -74,8 +74,8 @@ def cleanChars (path : List Char) : List Char :=
     -- Turn empty string into "."
     if w == 0 then ['.'] else out.reverse
 
-/-- The shortest path equivalent to `path` by lexical processing alone,
-    as Go's `path.Clean` gives it. -/
+/-- The path cleaned by lexical processing alone, as Go's `path.Clean`
+    cleans it. -/
 def clean (path : String) : String :=
   String.ofList (cleanChars path.toList)
 

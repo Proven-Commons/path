@@ -61,8 +61,9 @@ Main.lean). Its answers are checked two ways.
 
 Inputs come from a recorded seed, after fixed sets:
 
-- Go's `cleantests` (each path, and each result) and `jointests`, and
-  the paths of Pike's paper;
+- Go's `cleantests` (each path, and each result) and `jointests`, a
+  join of an empty element and a rooted one, and the paths of Pike's
+  paper;
 - every path of up to 10 characters over `a`, `.` and `/`, and of up
   to 7 over `a`, `b`, `.` and `/`;
 - random paths of up to 80 characters, built from `/`, `.`, `..`,
@@ -74,8 +75,10 @@ Inputs come from a recorded seed, after fixed sets:
   they take is recorded;
 - malformed requests, which the tool must answer with `error`, among
   them hex that is not UTF-8;
-- the command-line modes `clean` and `join`, and wrong arguments: what
-  each run prints on standard output and its exit status.
+- the command-line modes `clean` and `join`, among them arguments that
+  are not UTF-8, which the Lean runtime replaces with U+FFFD, and wrong
+  arguments: what each run prints on standard output and its exit
+  status.
 
 Every seventh request ends in CR LF.
 
@@ -310,7 +313,7 @@ def inputs(seed, count):
         yield ("Go cleantests, the result", "clean", [r])
     for es, _ in GO_JOIN:
         yield ("Go jointests", "join", es)
-    yield ("Go jointests", "join", ["", "/etc"])
+    yield ("an empty first element, a rooted second", "join", ["", "/etc"])
     for p in MORE_PATHS:
         yield ("Pike, and edges", "clean", [p])
     yield from exhaustive()
@@ -494,6 +497,12 @@ def cli_cases():
         cases.append((["clean", p], model_clean(p), 0))
     for es in [[], [""], ["a", "b"], ["", "/etc"], ["/", "..", "x/"], ["a", "", "", "b"]]:
         cases.append((["join"] + es, model_join(es), 0))
+    # Arguments that are not UTF-8: the Lean runtime replaces each run of
+    # such octets with U+FFFD before `main` sees them, as Python's
+    # "replace" does for these.
+    for raw in [b"\xc3/x/.", b"a\xff/../b\xff"]:
+        cases.append((["clean", raw], model_clean(raw.decode("utf-8", "replace")), 0))
+    cases.append((["join", b"\xff", "b"], model_join(["\ufffd", "b"]), 0))
     for args in [[], ["bogus"], ["clean"], ["clean", "a", "b"], ["serve", "x"], ["Clean", "a"]]:
         cases.append((args, "", 2))
     return cases

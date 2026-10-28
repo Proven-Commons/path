@@ -21,6 +21,15 @@ theorem rules_end (p : String) :
       Normal (Rooted p.toList) es' :=
   ⟨elems p.toList, nf _ (elems p.toList), elems_splits _, steps_nf_self _ _, nf_normal _ _⟩
 
+theorem step_shortens (rooted : Bool) (es es' : List Element) (h : Step rooted es es') :
+    es'.length < es.length := by
+  cases h <;> simp <;> omega
+
+theorem rules_unique (rooted : Bool) (es e1 e2 : List Element)
+    (h1 : Steps rooted es e1) (n1 : Normal rooted e1)
+    (h2 : Steps rooted es e2) (n2 : Normal rooted e2) : e1 = e2 := by
+  rw [steps_normal_eq _ _ _ h1 n1, steps_normal_eq _ _ _ h2 n2]
+
 theorem normal_iff (rooted : Bool) (es : List Element) :
     Normal rooted es ↔
       ∃ k names, es = List.replicate k dotdot ++ names ∧ (rooted = true → k = 0) ∧
