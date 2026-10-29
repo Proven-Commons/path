@@ -1,4 +1,5 @@
 name = "path"
+license = "Apache-2.0"
 version = "0.1.0"
 defaultTargets = ["Path", "Spec", "Proofs", "path"]
 
