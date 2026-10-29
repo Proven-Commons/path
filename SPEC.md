@@ -1,6 +1,6 @@
 # Specification: path
 
-Go's documentation of `path.Clean` (https://pkg.go.dev/path#Clean) says it gives "the shortest path name equivalent to path by purely lexical processing". It reads only the string: it never looks at a file system. This library cleans paths by the rules of that documentation, and joins them as `path.Join` does, in Lean, on strings. That the result is the shortest such path is Go's description; it is not a statement here.
+Go's documentation of `path.Clean` (https://pkg.go.dev/path#Clean) says it gives "the shortest path name equivalent to path by purely lexical processing". It reads only the string: it never looks at a file system. This library cleans paths by the rules of that documentation, and joins them as `path.Join` does, in Lean, on strings. That the result is the shortest such path is Go's description; it is not a statement here. Quotations of Go's documentation here are copyright 2009 The Go Authors, under the BSD-3-Clause license in `LICENSES/Go-LICENSE`.
 
 A reviewer who did not write this specification approves it. The approval also covers `Spec.lean`, `Spec/Defs.lean`, and the other files that `bar.toml` lists.
 
