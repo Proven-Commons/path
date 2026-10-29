@@ -32,12 +32,12 @@ The statements are in `Spec.lean`. The rules they use are in `Spec/Defs.lean`, w
 |-------|---------|
 | Whatever order Go's rules are applied in to the elements of a path, once none applies, the elements they leave are those of `clean p`. | `Spec.clean_rules` |
 | The rules can always be applied until none applies, and they leave the elements of `clean p`. | `Spec.rules_end` |
-| `clean p` names exactly one list of elements, as a path rooted exactly when `p` is; so in any order the rules end at the same elements. | `Spec.clean_names` |
+| `clean p` names exactly one list of elements, as a path rooted exactly when `p` is; so, with `clean_rules`, whatever order the rules are applied in, once none applies they leave the same elements. | `Spec.clean_names` |
 | The elements of `clean p` are some `..`, none if `p` is rooted, then names: no empty element and no `.`. | `Spec.clean_shape` |
 | Cleaning a clean path changes nothing. | `Spec.clean_idem` |
 | `join` leaves out empty elements, joins the rest with slashes and cleans them, and gives the empty string when nothing is left. | `Spec.join_eq` |
 | A clean relative path with no `..`, joined to any path `b`, gives the elements of `clean b`, then its own. | `Spec.join_inside` |
-| Any path cleaned as rooted, joined to a path `b` that is not empty, gives the elements of `clean b`, then elements with no `..`. | `Spec.join_root_inside` |
+| Any path cleaned as rooted, joined to a path `b` that is not the empty string (`.` and `/` are covered), gives the elements of `clean b`, then elements with no `..`. | `Spec.join_root_inside` |
 | Go's tests of Clean, `cleantests`: each path cleans to its result, and the result to itself. Go's tests of Join, `jointests`. | `Spec.go_clean_tests`, `Spec.go_join_tests` |
 
 ## What is not proved
@@ -45,9 +45,10 @@ The statements are in `Spec.lean`. The rules they use are in `Spec/Defs.lean`, w
 - **Go's code.** The proofs are against Go's documentation, written down in `Spec/Defs.lean`. That `clean` and `join` give what go1.24.7's `path.Clean` and `path.Join` give is tested (`tests/TEST-RESULTS.md`), not proved; only Go's own test tables are proved.
 - **The file system.** The rules are lexical. If `b/x` is a symbolic link, `b/x/..` on the file system need not be `b`, and a link inside a folder can point outside it.
 - **Two slashes at the start.** POSIX lets a system give `//` at the start of a path a meaning of its own. Go, and this library, read it as `/`; Python keeps it. That is a choice, recorded in `SPEC.md`.
-- **The empty folder.** `join ["", u]` leaves the empty element out, so `join ["", clean ("/" ++ u)]` is rooted. `join_root_inside` needs a folder that is not empty.
+- **That every order of the rules ends.** Each rule drops one element or two, as `Spec.Step` shows. This is read off the definition, not a statement, since bar item 3 asks every statement to mention `Path.clean`.
+- **The empty string as the folder.** `join` leaves an empty element out, so `join ["", clean ("/" ++ u)]` is `clean ("/" ++ u)` itself (`join_eq`, `clean_idem`): a path from the root that `u` chooses, such as `/etc/passwd` for `u` = `../../etc/passwd`. `join_root_inside` needs `b ≠ ""`; pass `.` for the current folder, as Go's `http.Dir` does.
 - **Other path functions** of Go: `Split`, `Base`, `Dir`, `Ext`, `IsAbs` and `Match`. Windows paths are not covered.
-- **Strings that are not UTF-8.** Lean strings are Unicode text, so a Go string holding other octets cannot be passed to the library. On the command line, the Lean runtime replaces each run of such octets in an argument with U+FFFD before `path clean` and `path join` see it, so for such an argument the tool prints a path Go would not. `path serve` refuses them.
+- **Strings that are not UTF-8.** Lean strings are Unicode text, so a Go string holding other octets cannot be passed to the library. On the command line, `path clean` and `path join` refuse an argument that is not UTF-8 with exit 2, since the Lean runtime would otherwise replace its ill-formed octets with U+FFFD and the tool would print a path Go would not; send such a path to `path serve` as hex, which answers `error` for it. The check reads the raw arguments from /proc/self/cmdline and is skipped where /proc is absent.
 - **Time and memory.** No proof bounds them. `clean` reads the path once, as Go's loop does, and removes each character it writes at most once; the tests clean paths of a million characters.
 - **Reading requests and printing answers in `Main.lean`.** The differential tests cover them.
 
