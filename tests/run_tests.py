@@ -30,7 +30,8 @@ Main.lean). Its answers are checked two ways.
    src/path/path_test.go). Every answer of the tool must equal the
    model's.
 
-2. Against three oracles, on every request each can answer:
+2. Against three oracles. Each oracle must answer every request, except
+   that Python is not asked `join`; any other `n/a` is a failure:
 
    - Go: `path.Clean` and `path.Join` of the Go standard library, the
      installed toolchain, through tests/oracles/go/main.go;
@@ -76,7 +77,7 @@ Inputs come from a recorded seed, after fixed sets:
 - malformed requests, which the tool must answer with `error`, among
   them hex that is not UTF-8;
 - the command-line modes `clean` and `join`, among them arguments that
-  are not UTF-8, which the Lean runtime replaces with U+FFFD, and wrong
+  are not UTF-8, which the tool must refuse with exit 2, and wrong
   arguments: what each run prints on standard output and its exit
   status.
 
@@ -497,12 +498,13 @@ def cli_cases():
         cases.append((["clean", p], model_clean(p), 0))
     for es in [[], [""], ["a", "b"], ["", "/etc"], ["/", "..", "x/"], ["a", "", "", "b"]]:
         cases.append((["join"] + es, model_join(es), 0))
-    # Arguments that are not UTF-8: the Lean runtime replaces each run of
-    # such octets with U+FFFD before `main` sees them, as Python's
-    # "replace" does for these.
-    for raw in [b"\xc3/x/.", b"a\xff/../b\xff"]:
-        cases.append((["clean", raw], model_clean(raw.decode("utf-8", "replace")), 0))
-    cases.append((["join", b"\xff", "b"], model_join(["\ufffd", "b"]), 0))
+    # Arguments that are not UTF-8 are refused with exit 2: Go would
+    # keep the octets, and the Lean runtime would have replaced them with
+    # U+FFFD. A real U+FFFD is UTF-8, and is cleaned as any character is.
+    for raw in [b"\xc3/x/.", b"a\xff/../b\xff", b"a/\xff", b"\xff", b"\xc3"]:
+        cases.append((["clean", raw], "", 2))
+    cases.append((["join", b"\xff", "b"], "", 2))
+    cases.append((["clean", "a/\ufffd"], model_clean("a/\ufffd"), 0))
     for args in [[], ["bogus"], ["clean"], ["clean", "a", "b"], ["serve", "x"], ["Clean", "a"]]:
         cases.append((args, "", 2))
     return cases
@@ -709,6 +711,9 @@ def main():
         for o in names:
             theirs = oracle_out[o][i]
             if theirs == "n/a":
+                # Only Python may refuse, and only `join` (see above).
+                if not (o == "Python" and op == "join"):
+                    failures.append((f"{o}: {short(request(op, a))}", short(want, 160), "n/a"))
                 continue
             asked[o] += 1
             by_op[o][op] = by_op[o].get(op, 0) + 1

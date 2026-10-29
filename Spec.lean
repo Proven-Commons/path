@@ -29,8 +29,8 @@ theorem rules_end (p : String) :
   sorry
 
 /-- `clean p` names exactly one list of elements, as a path rooted when
-    `p` is. With `clean_rules`, every order of the rules ends at the
-    same elements. -/
+    `p` is. With `clean_rules`, whatever order the rules are applied in,
+    once none applies, the elements left are the same. -/
 theorem clean_names (p : String) :
     ∃ es, Names (Path.clean p) (Rooted p.toList) es ∧
       ∀ es', Names (Path.clean p) (Rooted p.toList) es' → es' = es := by
@@ -69,8 +69,9 @@ theorem join_inside (b q : String) (eq : List Element) (hq : Names q false eq)
   sorry
 
 /-- Any path `u`, cleaned as a rooted path and joined to a path `b`
-    that is not empty, stays inside `b`. If `b` is empty, `join` leaves
-    it out, and the result is rooted (see `go_join_tests`). -/
+    that is not the empty string (`.` and `/` are covered), stays inside
+    `b`. If `b` is the empty string, `join` leaves it out, and the
+    result is `clean ("/" ++ u)` itself (see `go_join_tests`). -/
 theorem join_root_inside (b u : String) (hb : b ≠ "") :
     ∃ eb ext, dotdot ∉ ext ∧ Names (Path.clean b) (Rooted b.toList) eb ∧
       Names (Path.join [b, Path.clean ("/" ++ u)]) (Rooted b.toList) (eb ++ ext) := by
