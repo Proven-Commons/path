@@ -1,6 +1,8 @@
 /-
   The rules of Go's `path.Clean`, written from its documentation
-  (https://pkg.go.dev/path#Clean, go1.24.7):
+  (https://pkg.go.dev/path#Clean, go1.24.7). The quoted text is Go's,
+  copyright 2009 The Go Authors, under the BSD-3-Clause license in
+  LICENSES/Go-LICENSE:
 
     Clean returns the shortest path name equivalent to path by purely
     lexical processing. It applies the following rules iteratively

@@ -184,7 +184,8 @@ def model_join(es):
     return model_clean("/".join(kept))
 
 
-# Go's tests: src/path/path_test.go, go1.24.7.
+# Go's tests: src/path/path_test.go, go1.24.7. Copyright 2009 The Go Authors,
+# under the BSD-3-Clause license in LICENSES/Go-LICENSE.
 GO_CLEAN = [
     ("", "."), ("abc", "abc"), ("abc/def", "abc/def"), ("a/b/c", "a/b/c"), (".", "."),
     ("..", ".."), ("../..", "../.."), ("../../abc", "../../abc"), ("/abc", "/abc"), ("/", "/"),

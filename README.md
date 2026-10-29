@@ -83,8 +83,14 @@ python3 tests/plant_bugs.py
 - `Spec/Defs.lean`: the rules the statements use, written from Go's documentation.
 - `Proofs.lean` and `Proofs/`: the proofs.
 - `Main.lean`: the command-line tool the tests drive.
-- `lakefile.toml`: the build. It names the package and its version, its libraries and executable, and the default targets, and sets nothing else.
+- `lakefile.toml`: the build. It names the package, its version and license, its libraries and executable, and the default targets, and sets nothing else.
 - `comparator.json`: which theorems `lake comparator` checks, and which axioms it allows.
 - `bar.toml`: the record for the bar check: status, authors, approvals, and where things are.
 - `SPEC.md`: the specification in plain words.
 - `tests/`: the differential tests, the oracles, and the planted bugs.
+- `LICENSE`: the Apache License 2.0, for this library's own code and documents.
+- `LICENSES/Go-LICENSE`: Go's BSD-3-Clause license, for the material copied from Go (below).
+
+## License
+
+The library's own code and documents are under the Apache License 2.0 (`LICENSE`). Some material is Go's, copyright 2009 The Go Authors, and keeps Go's BSD-3-Clause license (`LICENSES/Go-LICENSE`): the test tables `cleantests` and `jointests` from src/path/path_test.go (go1.24.7), copied into `Spec.lean` and `tests/run_tests.py`, and the quotations of Go's documentation in `SPEC.md`, `Spec/Defs.lean` and this page.
