@@ -93,4 +93,4 @@ python3 tests/plant_bugs.py
 
 ## License
 
-The library's own code and documents are under the Apache License 2.0 (`LICENSE`). Some material is Go's, copyright 2009 The Go Authors, and keeps Go's BSD-3-Clause license (`LICENSES/Go-LICENSE`): the test tables `cleantests` and `jointests` from src/path/path_test.go (go1.24.7), copied into `Spec.lean` and `tests/run_tests.py`, and the quotations of Go's documentation in `SPEC.md`, `Spec/Defs.lean` and this page.
+The library's own code and documents are under the Apache License 2.0 (`LICENSE`). Some material is Go's, copyright 2009 The Go Authors, and keeps Go's BSD-3-Clause license (`LICENSES/Go-LICENSE`): the loop in `Path/Basic.lean`, a line-by-line port of `path.Clean`; the test tables `cleantests` and `jointests` from src/path/path_test.go (go1.24.7), copied into `Spec.lean` and `tests/run_tests.py`; and the quotations of Go's documentation in `SPEC.md`, `Spec/Defs.lean`, `Spec.lean` and this page.

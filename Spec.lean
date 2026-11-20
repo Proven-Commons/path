@@ -49,9 +49,10 @@ theorem clean_shape (p : String) (es : List Element)
 theorem clean_idem (p : String) : Path.clean (Path.clean p) = Path.clean p := by
   sorry
 
-/-- `join`, as Go's documentation says: "Join joins any number of path
-    elements into a single path, separating them with slashes. Empty
-    elements are ignored. The result is Cleaned. However, if the
+/-- `join`, as Go's documentation says (copyright 2009 The Go Authors,
+    BSD-3-Clause, see LICENSES/Go-LICENSE): "Join joins any number of
+    path elements into a single path, separating them with slashes.
+    Empty elements are ignored. The result is Cleaned. However, if the
     argument list is empty or all its elements are empty, Join returns
     an empty string." -/
 theorem join_eq (es : List String) :

@@ -1,6 +1,8 @@
 /-
   Lexical path cleaning, as Go's `path.Clean` and `path.Join` do it
-  (go1.24.7, src/path/path.go). The loop below follows Go's line by
+  (go1.24.7, src/path/path.go). Derived from `Clean` in src/path/path.go
+  (go1.24.7); copyright 2009 The Go Authors, under the BSD-3-Clause
+  license in LICENSES/Go-LICENSE. The loop below follows Go's line by
   line. Go writes into a buffer and keeps its length `w`; here the
   buffer is a list, kept reversed so that writing and removing at the
   end take one step, and `w` is its length. Go reads the input by
