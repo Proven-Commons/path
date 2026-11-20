@@ -87,8 +87,9 @@ def Normal (rooted : Bool) (es : List Element) : Prop :=
 
 /-- The path with these elements: a slash first when it is rooted, a
     slash between each two elements, and `.` for no elements in a path
-    that is not rooted. When no element is empty, as when no rule
-    applies, it ends in a slash only when it is the root `/`. -/
+    that is not rooted. When no element is empty or holds a slash, as
+    for a list that `Names` gives, it ends in a slash only when it is
+    the root `/`. -/
 def render (rooted : Bool) (es : List Element) : List Char :=
   if rooted then '/' :: List.intercalate ['/'] es
   else if es = [] then dot
