@@ -8,6 +8,14 @@
   line end. `path join` with no elements, or only empty ones, prints an
   empty line. Wrong arguments exit with 2.
 
+  The Lean runtime decodes each argument as UTF-8 before `main` sees
+  it, and replaces ill-formed octets with U+FFFD. So `main` first reads
+  the raw arguments from /proc/self/cmdline, and refuses with exit 2 if
+  any of them is not UTF-8: Go would keep those octets, and the
+  replaced string would give an answer Go does not. Such a path can be
+  sent to `path serve` as hex. Where /proc is absent, the check is
+  skipped.
+
     path serve
 
   answers requests on standard input, one per line, for the
@@ -24,8 +32,9 @@
   lower case, or octets that are not UTF-8. A request line may end in
   LF or CR LF.
 
-  Every answer comes from the proved functions in `Path/`. The hex
-  coding and the request handling here are covered by the tests, not by
+  Every answer comes from the proved functions in `Path/`, applied to
+  the arguments as `main` receives them. The hex coding, the argument
+  check and the request handling here are covered by the tests, not by
   a proof.
 -/
 
@@ -96,7 +105,20 @@ def serve : IO Unit := do
 def usage : String :=
   "usage: path clean PATH\n       path join ELEM...\n       path serve"
 
+/-- Whether every argument, as the process received it, is UTF-8.
+    /proc/self/cmdline holds argv[0] and then each argument, each ended
+    by a NUL. Without /proc, it answers `true`, as before this check. -/
+def rawArgsUTF8 : IO Bool := do
+  try
+    let raw ← IO.FS.readBinFile "/proc/self/cmdline"
+    let parts := (raw.toList.splitOn 0).drop 1
+    pure (parts.all fun p => (String.fromUTF8? (ByteArray.mk p.toArray)).isSome)
+  catch _ => pure true
+
 def main (args : List String) : IO UInt32 := do
+  unless (← rawArgsUTF8) do
+    IO.eprintln "path: an argument is not UTF-8; send it to `path serve` as hex"
+    return 2
   match args with
   | ["clean", p] => IO.println (Path.clean p); return 0
   | "join" :: es => IO.println (Path.join es); return 0

@@ -15,13 +15,13 @@ Written by `tests/run_tests.py`. Rerun it to check these numbers.
 - The model on Go's `cleantests` and `jointests`: 47 of 47
 - The model's two parts, the rules applied in a random order and the stack, agree on 147239 of 147239 paths
 - Answers that differ from the model: 0
-- Long inputs: 12, 12296441 characters in all, answered in 2.8 s by one `path serve`
+- Long inputs: 12, 12296441 characters in all, answered in 5.6 s by one `path serve`
 - Agreement with each oracle over the requests it answers: Go 167263 of 167263, Python 138020 of 147250, Node 117446 of 167263
 - Requests each oracle answers, by operation: Go: clean 147250, join 20013; Python: clean 147250; Node: clean 147250, join 20013
 - Malformed requests answered `error`: 31 of 31
 - Requests ending in CR LF: every seventh, 23893
 - Last lines sent alone, with no LF, with CR LF, or with a lone CR, answered right: 4 of 4
-- Command-line modes (`clean`, `join`, and wrong arguments), printing and exiting as the model says: 21 of 21
+- Command-line modes (`clean`, `join`, and wrong arguments), printing and exiting as the model says: 25 of 25
 - Failures: 0
 
 ## Where the oracles differ
